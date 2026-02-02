@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-)&2b9(9td7*@aurfwgq93as+8qa7z9qf@rh=!o@)vm%)qs-^ka
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -136,4 +136,5 @@ RAZORPAY_KEY_ID = 'rzp_test_qHWUbkIiLDISfr'
 RAZORPAY_KEY_SECRET = 'sm3pCJNKdzAijTfJt2RQdtwF'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 
