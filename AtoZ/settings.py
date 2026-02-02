@@ -1,10 +1,9 @@
 """
 Django settings for AtoZ project.
-Production-ready for Vercel + Neon
+Neon + Vercel (hardcoded keys, works immediately)
 """
 
 from pathlib import Path
-import os
 from urllib.parse import urlparse
 
 # --------------------------------------------------
@@ -16,12 +15,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # --------------------------------------------------
 # SECURITY
 # --------------------------------------------------
-SECRET_KEY = os.environ.get(
-    "SECRET_KEY",
-    "django-insecure-change-this-in-production"
-)
+SECRET_KEY = "oh#7xtx7-*4y#8u!09g5#h-14pg3rly6k$ny_87_+sittxddrt"
 
-DEBUG = False  # MUST be False on Vercel
+DEBUG = False
 
 ALLOWED_HOSTS = [
     "knlatoz.vercel.app",
@@ -87,12 +83,13 @@ TEMPLATES = [
 
 
 # --------------------------------------------------
-# DATABASE (Neon Postgres)
+# DATABASE (NEON – HARDCODED)
 # --------------------------------------------------
-DATABASE_URL = os.environ.get("DATABASE_URL")
-
-if not DATABASE_URL:
-    raise RuntimeError("DATABASE_URL not set")
+DATABASE_URL = (
+    "postgresql://neondb_owner:npg_bQSe3gqRfD2I@"
+    "ep-noisy-butterfly-a1wpwav2-pooler.ap-southeast-1.aws.neon.tech/"
+    "neondb?sslmode=require&channel_binding=require"
+)
 
 url = urlparse(DATABASE_URL)
 
@@ -132,12 +129,9 @@ USE_TZ = True
 
 
 # --------------------------------------------------
-# STATIC FILES (YOU SAID YOU DON’T WANT THEM)
+# STATIC FILES
 # --------------------------------------------------
 STATIC_URL = "/static/"
-# NO STATICFILES_DIRS
-# NO STATIC_ROOT
-# NO WHITENOISE
 
 
 # --------------------------------------------------
@@ -155,7 +149,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # --------------------------------------------------
-# RAZORPAY (USE ENV VARS ON VERCEL)
+# RAZORPAY (HARDCODED)
 # --------------------------------------------------
-RAZORPAY_KEY_ID = os.environ.get("RAZORPAY_KEY_ID", "")
-RAZORPAY_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET", "")
+RAZORPAY_KEY_ID = "rzp_test_qHWUbkIiLDISfr"
+RAZORPAY_KEY_SECRET = "sm3pCJNKdzAijTfJt2RQdtwF"
