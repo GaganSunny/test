@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>{{ service_name }} - Address Details</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: "Segoe UI", sans-serif;
+            background-color: #f6f7fb;
+            display: flex;
+            justify-content: center;
+            padding: 50px 20px;
+        }
+
+        .form-card {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+
+        label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        #suggestions {
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            max-height: 150px;
+            overflow-y: auto;
+            position: absolute;
+            z-index: 999;
+            width: calc(100% - 24px);
+        }
+
+        .suggestion-item {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        .suggestion-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        #map {
+            height: 300px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 12px 20px;
+            background-color: #ff6f00;
+            color: white;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #e86500;
+        }
+
+        /* Modal styling */
+        #order-success-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+        }
+
+        #order-success-modal>div {
+            background: white;
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 30px 10px;
+            }
+
+            .form-card {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            button {
+                font-size: 15px;
+                padding: 10px 16px;
+            }
+
+            #map {
+                height: 250px;
+            }
+
+            #order-success-modal>div {
+                margin: 60px 10px;
+                width: 90%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 18px;
+            }
+
+            input[type="text"],
+            textarea {
+                font-size: 13px;
+            }
+
+            #map {
+                height: 200px;
+            }
+
+            button {
+                font-size: 14px;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="form-card">
+        <h1>Provide Address for {{ service_name }}</h1>
+        <form id="address-form">
+            {% csrf_token %}
+            <label for="colony">Colony/Area:</label>
+            <input type="text" id="colony" name="colony" autocomplete="off" required />
+            <div id="suggestions"></div>
+
+            <label for="address">Full Address:</label>
+            <textarea id="address" name="address" rows="3" required></textarea>
+
+            <label>Pin your location:</label>
+            <div id="map"></div>
+
+            <label for="latitude">Latitude:</label>
+            <input type="text" id="latitude" name="latitude" readonly required />
+
+            <label for="longitude">Longitude:</label>
+            <input type="text" id="longitude" name="longitude" readonly required />
+
+            <button type="button" id="pay-button">Pay ₹250</button>
+        </form>
+    </div>
+
+    <!-- Order Success Modal -->
+    <div id="order-success-modal"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000;">
+        <div
+            style="background:white; max-width:400px; margin:100px auto; padding:30px; border-radius:12px; text-align:center; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
+            <h2 style="color:#28a745;">🎉 Order Successful!</h2>
+            <div class="modal-body" style="margin-top:15px; font-size:16px;"></div>
+            <p style="margin-top:20px; font-size:14px; color:#888;">Redirecting...</p>
+        </div>
+    </div>
+
+    <!-- jQuery & Leaflet -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <!-- Razorpay -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <script>
+        const coloniesInKurnool = [
+            { name: "B-Camp", lat: 15.8027, lon: 78.0412},
+            { name: "A-Camp", lat: 15.8173, lon: 78.0455},
+            { name: "Abbas Nagar", lat: 15.8019, lon: 78.0355},
+            { name: "Balaji Naggar", lat: 15.8432, lon: 78.0162},
+            { name: "B.Thandrapadu", lat: 15.7643, lon: 78.0650},
+            { name: "Gandhi Nagar", lat: 15.8306, lon: 78.0417},
+            { name: "New Krishna Nagar", lat: 15.8091, lon: 78.0342},
+            { name: "Kotha Peta", lat: 15.8365, lon: 78.0427},
+            { name: "Madhavi Nagar", lat: 15.7968, lon: 78.0517},
+            { name: "Mahalakshmi Nagar", lat: 15.7943, lon: 78.0402},
+            { name: "Nehru Auto Nagar", lat: 15.8261, lon: 78.0071},
+            { name: "N.R Peta", lat: 15.8362, lon: 78.0521},
+            { name: "Postal Colony", lat: 15.8427, lon: 78.0373},
+            { name: "Prakash Nagar", lat: 15.8348, lon: 78.0393},
+            { name: "River View Colony", lat: 15.8289, lon: 78.0363},
+            { name: "Santosh Nagar", lat: 15.8421, lon: 78.0095},
+            { name: "Sita Rama Nagar", lat: 15.8304, lon: 78.0256},
+            { name: "Stantanpuram", lat: 15.8431, lon: 78.0118},
+            { name: "Teachers Colony", lat: 15.8376, lon: 78.0249},
+            { name: "Venkataramana Colony", lat: 15.8371, lon: 78.0205},
+            { name: "Telecom Nagar", lat: 15.7994, lon: 78.0480},
+            { name: "BangarPet", lat: 15.8296, lon: 78.0329},
+            { name: "Maruthi Nagar", lat: 15.7971, lon: 78.0626},
+            
+        ];
+
+        const map = L.map('map').setView([15.8348, 78.0432], 14);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        const marker = L.marker([15.8348, 78.0432], { draggable: true }).addTo(map);
+
+        function fetchAddressFromCoords(lat, lon) {
+            $.getJSON("https://nominatim.openstreetmap.org/reverse", {
+                lat: lat,
+                lon: lon,
+                format: "json"
+            }, function (data) {
+                if (data && data.display_name) {
+                    $('#address').val(data.display_name);
+                }
+            });
+        }
+
+        marker.on('dragend', function () {
+            const pos = marker.getLatLng();
+            $('#latitude').val(pos.lat.toFixed(6));
+            $('#longitude').val(pos.lng.toFixed(6));
+            fetchAddressFromCoords(pos.lat, pos.lng);
+        });
+
+        map.on('click', function (e) {
+            marker.setLatLng(e.latlng);
+            $('#latitude').val(e.latlng.lat.toFixed(6));
+            $('#longitude').val(e.latlng.lng.toFixed(6));
+            fetchAddressFromCoords(e.latlng.lat, e.latlng.lng);
+        });
+
+        $('#colony').on('input', function () {
+            const query = $(this).val().toLowerCase();
+            const matches = coloniesInKurnool.filter(c => c.name.toLowerCase().includes(query));
+            let html = '';
+            matches.forEach(c => {
+                html += `<div class="suggestion-item" data-lat="${c.lat}" data-lon="${c.lon}">${c.name}</div>`;
+            });
+            $('#suggestions').html(html);
+        });
+
+        $('#suggestions').on('click', '.suggestion-item', function () {
+            const lat = parseFloat($(this).data('lat'));
+            const lon = parseFloat($(this).data('lon'));
+            const name = $(this).text();
+
+            $('#colony').val(name);
+            $('#latitude').val(lat.toFixed(6));
+            $('#longitude').val(lon.toFixed(6));
+            marker.setLatLng([lat, lon]);
+            map.setView([lat, lon], 16);
+            fetchAddressFromCoords(lat, lon);
+            $('#suggestions').empty();
+        });
+
+        $(document).on('click', function (e) {
+            if (!$(e.target).closest('#colony, #suggestions').length) {
+                $('#suggestions').empty();
+            }
+        });
+
+        $('#pay-button').click(function () {
+            const options = {
+                key: "{{ razorpay_key_id }}",
+                amount: 25000,  // 250 INR in paisa
+                currency: "INR",
+                name: "A TO Z",
+                description: "Service Payment",
+                handler: function (response) {
+                    const paymentId = response.razorpay_payment_id;
+                    $('#order-success-modal .modal-body').html(`<p>Payment successful!</p><p><strong>Payment ID:</strong> ${paymentId}</p>`);
+                    $('#order-success-modal').fadeIn();
+
+                    const formData = {
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        service_name: "{{ service_name }}",
+                        address: $('#address').val(),
+                        payment_id: paymentId,
+                        latitude: $('#latitude').val(),
+                        longitude: $('#longitude').val()
+                    };
+
+                    $.ajax({
+                        url: '{% url "create_order" %}',
+                        method: 'POST',
+                        data: formData,
+                        success: function () {
+                            setTimeout(() => {
+                                window.location.href = "{% url 'payment_success' %}";
+                            }, 3000);
+                        },
+                        error: function () {
+                            alert("Error saving your order. Please contact support.");
+                        }
+                    });
+                },
+                theme: {
+                    color: "#ff6f00"
+                }
+            };
+            const rzp = new Razorpay(options);
+            rzp.open();
+        });
+    </script>
+</body>
+
+</html>

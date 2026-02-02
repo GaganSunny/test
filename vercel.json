@@ -1,0 +1,17 @@
+{
+  "builds": [
+    {
+      "src": "AtoZ/wsgi.py",
+      "use": "@vercel/python",
+      "config": {
+        "runtime": "python3.11"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "AtoZ/wsgi.py"
+    }
+  ]
+}

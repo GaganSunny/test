@@ -1,0 +1,281 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>A TO Z</title>
+    <style>
+        /* Reset and box-sizing */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+            color: #222;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background-color: white;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav h1 {
+            font-size: 1.5rem;
+            color: #222;
+            flex: 1 1 200px;
+        }
+
+        nav h1 span {
+            color: #e63946;
+            /* red shade */
+            font-weight: 700;
+        }
+
+        nav .middle {
+            flex: 2 1 300px;
+            text-align: center;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1d3557;
+            /* dark blue */
+            min-width: 200px;
+        }
+
+        nav .right {
+            flex: 1 1 200px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            min-width: 180px;
+        }
+
+        nav .right a {
+            text-decoration: none;
+            background-color: #e63946;
+            color: white;
+            padding: 8px 18px;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            white-space: nowrap;
+        }
+
+        nav .right a:hover {
+            background-color: #a62831;
+        }
+
+        /* Section container */
+        .section {
+            flex-grow: 1;
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto 40px;
+            width: 100%;
+        }
+
+        /* Service grid */
+        ul.service-grid {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            padding: 0;
+        }
+
+        ul.service-grid li {
+            background-color: #ffffff;
+            border: 2px solid #1d3557;
+            border-radius: 12px;
+            padding: 20px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(29, 53, 87, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        ul.service-grid li:hover {
+            background-color: #1d3557;
+            border-color: #e63946;
+            /* color: white; */
+            box-shadow: 0 8px 15px rgba(230, 57, 70, 0.3);
+        }
+
+        ul.service-grid li:hover h3 {
+            color: white;
+        }
+
+        ul.service-grid li img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 15px;
+            transition: filter 0.3s ease;
+        }
+
+
+
+        ul.service-grid li h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-top: auto;
+            transition: color 0.3s ease;
+        }
+
+        ul.service-grid li a {
+            color: inherit;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+        }
+
+        ul.service-grid li a:visited {
+            color: inherit;
+        }
+
+        /* Attribution footer */
+        .attribution {
+            font-size: 0.85rem;
+            color: #666;
+            text-align: center;
+            padding: 15px 10px;
+            font-family: Arial, sans-serif;
+            margin-top: auto;
+        }
+
+        .attribution a {
+            color: #1d3557;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .attribution a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive tweaks */
+        @media (max-width: 768px) {
+            nav .middle {
+                font-size: 1.4rem;
+                margin: 10px 0 0 0;
+                flex-basis: 100%;
+                order: 3;
+            }
+
+            nav h1,
+            nav .right {
+                flex-basis: 50%;
+            }
+
+            nav .right {
+                justify-content: flex-start;
+            }
+
+            .section {
+                padding: 25px 15px;
+            }
+
+            ul.service-grid {
+                grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+                gap: 18px;
+            }
+
+            ul.service-grid li img {
+                width: 60px;
+                height: 60px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            nav {
+                padding: 12px 15px;
+            }
+
+            nav h1 {
+                font-size: 1.2rem;
+            }
+
+            nav .right a {
+                padding: 6px 12px;
+                font-size: 0.9rem;
+            }
+
+            ul.service-grid {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 15px;
+            }
+
+            ul.service-grid li {
+                padding: 15px 10px;
+            }
+
+            ul.service-grid li h3 {
+                font-size: 1rem;
+            }
+
+            ul.service-grid li img {
+                width: 50px;
+                height: 50px;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <h1>Welcome, <span>{{ user.username }}</span></h1>
+        <div class="middle">A TO Z Services</div>
+        <div class="right">
+            <a href="{% url 'my_orders' %}">My Orders</a>
+
+            <form method="POST" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit">Logout</button>
+            </form>
+        </div>
+    </nav>
+
+
+    <div class="section">
+        <ul class="service-grid">
+            {% for service in services %}
+            <li>
+                <a href="{% url 'service_product' %}?name={{ service.name|urlencode }}">
+                    <h3>{{ service.name }}</h3>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+
+
+</body>
+
+</html>

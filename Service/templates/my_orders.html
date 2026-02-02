@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Orders</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f7f9fc;
+            padding: 30px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .orders {
+            display: grid;
+            gap: 20px;
+            max-width: 900px;
+            margin: auto;
+        }
+        .order-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+        }
+        .order-card:hover {
+            transform: scale(1.02);
+        }
+        .order-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #007BFF;
+        }
+        .order-details {
+            color: #555;
+        }
+        a.view-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        a.view-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>My Orders</h1>
+    <div class="orders">
+        {% for order in orders %}
+            <div class="order-card">
+                <div class="order-title">Order #{{ order.id }} - {{ order.service_name }}</div>
+                <div class="order-details">
+                    <p><strong>Status:</strong> {{ order.status }}</p>
+                    <p><strong>Amount:</strong> ₹{{ order.amount }}</p>
+                    <p><strong>Created:</strong> {{ order.created_at|date:"M d, Y H:i" }}</p>
+                </div>
+                <a class="view-link" href="{% url 'order_detail' order.id %}">View Details →</a>
+            </div>
+        {% empty %}
+            <p style="text-align:center;">No orders yet.</p>
+        {% endfor %}
+    </div>
+</body>
+</html>

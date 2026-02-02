@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Order Successful</title>
+<style>
+  /* Reset */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0fff4;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 600px;
+    width: 100%;
+    padding: 40px 35px;
+    background-color: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: box-shadow 0.3s ease;
+  }
+
+  .container:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  }
+
+  .success-icon {
+    font-size: 70px;
+    color: #38a169;
+    margin-bottom: 25px;
+  }
+
+  h1 {
+    color: #2f855a;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    font-weight: 700;
+  }
+
+  p {
+    font-size: 1.125rem;
+    color: #4a5568;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  .btn {
+    display: inline-block;
+    margin-top: 30px;
+    padding: 14px 28px;
+    background-color: #38a169;
+    color: #fff;
+    font-size: 1.125rem;
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .btn:hover,
+  .btn:focus {
+    background-color: #2f855a;
+    transform: translateY(-2px);
+    outline: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    .container {
+      padding: 30px 25px;
+    }
+
+    .success-icon {
+      font-size: 55px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 15px;
+    }
+
+    p {
+      font-size: 1rem;
+      margin-bottom: 10px;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      font-size: 1rem;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="success-icon" aria-label="Success checkmark">✅</div>
+    <h1>Payment Successful!</h1>
+    <p>Thank you for your order. We've received your payment of ₹250.</p>
+    <p>Your service will be delivered shortly. We'll contact you if needed.</p>
+    <a href="/" class="btn" role="button">Go to Homepage</a>
+  </div>
+</body>
+</html>

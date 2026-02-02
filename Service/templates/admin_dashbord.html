@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin Dashboard</title>
+<style>
+  /* Reset some defaults */
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 20px;
+    background: #f9fafb;
+    color: #333;
+    line-height: 1.5;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-weight: 700;
+    color: #222;
+  }
+
+  .order {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: box-shadow 0.3s ease;
+  }
+  .order:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  }
+
+  .order h3 {
+    margin: 0 0 8px;
+    font-size: 1.3rem;
+    color: #111;
+  }
+
+  .order p {
+    margin: 0;
+    font-size: 1rem;
+  }
+
+  /* Forms container */
+  .forms {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+
+  form {
+    flex: 1;
+    min-width: 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #555;
+  }
+
+  select, button {
+    padding: 10px 12px;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 1.5px solid #ccc;
+    outline-offset: 2px;
+    transition: border-color 0.3s ease;
+  }
+
+  select:focus {
+    border-color: #007bff;
+  }
+
+  button {
+    cursor: pointer;
+    font-weight: 600;
+    border: none;
+    color: #fff;
+    transition: background-color 0.3s ease;
+  }
+
+  .assign-btn {
+    background-color: #28a745;
+  }
+  .assign-btn:hover,
+  .assign-btn:focus {
+    background-color: #218838;
+  }
+
+  .cancel-btn {
+    background-color: #dc3545;
+  }
+  .cancel-btn:hover,
+  .cancel-btn:focus {
+    background-color: #c82333;
+  }
+
+  /* Responsive typography */
+  @media (max-width: 600px) {
+    body {
+      margin: 12px;
+      font-size: 14px;
+    }
+    .order h3 {
+      font-size: 1.1rem;
+    }
+    select, button {
+      font-size: 0.95rem;
+    }
+    .forms {
+      flex-direction: column;
+    }
+    form {
+      min-width: auto;
+      width: 100%;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <h1>Pending & Rejected Orders</h1>
+
+  {% for order in orders %}
+    <div class="order">
+      <h3>Order #{{ order.id }} by {{ order.user.username }}</h3>
+      <p><strong>Service:</strong> {{ order.service_name }}</p>
+      <p><strong>Address:</strong> {{ order.address }}</p>
+      <p><strong>Amount:</strong> ₹{{ order.amount }}</p>
+      <p><strong>Status:</strong> {{ order.status }}</p>
+      <p><strong>Location:</strong> <a target="_blank" href="https://www.google.com/maps?q={{order.latitude}},{{order.longitude}}">Click me</a></p>
+
+      <div class="forms">
+        <!-- Assign form -->
+        <form method="post" style="margin-bottom: 0;">
+          {% csrf_token %}
+          <input type="hidden" name="order_id" value="{{ order.id }}">
+          <label for="provider_{{ order.id }}">Assign to:</label>
+          <select name="provider_id" id="provider_{{ order.id }}" required>
+            <option value="">-- Select Provider --</option>
+            {% for provider in service_providers %}
+              <option value="{{ provider.id }}">{{ provider.servicer_name }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="assign-btn">Assign</button>
+        </form>
+
+        <!-- Cancel form -->
+        <form method="post" action="{% url 'cancel_order_by_admin' order.id %}">
+          {% csrf_token %}
+          <button type="submit" class="cancel-btn">Cancel Order</button>
+        </form>
+      </div>
+    </div>
+  {% empty %}
+    <p style="text-align: center; font-style: italic; color: #666;">No pending or rejected orders.</p>
+  {% endfor %}
+
+</body>
+</html>

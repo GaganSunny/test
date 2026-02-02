@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Service Provider Dashboard</title>
+<style>
+  /* Reset */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f9fafb;
+    padding: 20px;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+  }
+
+  .dashboard {
+    width: 100%;
+    max-width: 900px;
+  }
+
+  h1 {
+    text-align: center;
+    color: #1f2937;
+    margin-bottom: 40px;
+    font-weight: 700;
+    font-size: 2.5rem;
+  }
+
+  h2 {
+    color: #374151;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #3b82f6;
+    padding-bottom: 6px;
+    font-weight: 600;
+    font-size: 1.5rem;
+  }
+
+  .section {
+    margin-bottom: 50px;
+  }
+
+  .order {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+    transition: box-shadow 0.3s ease;
+  }
+
+  .order:hover {
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
+  }
+
+  .order h3 {
+    margin-top: 0;
+    color: #2563eb;
+    font-weight: 700;
+    font-size: 1.3rem;
+  }
+
+  .order p {
+    margin: 8px 0;
+    color: #4b5563;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  form {
+    margin-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+
+  label {
+    font-weight: 600;
+    color: #374151;
+  }
+
+  input[type="text"] {
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1.8px solid #cbd5e1;
+    font-size: 1rem;
+    width: 100px;
+    transition: border-color 0.3s ease;
+  }
+
+  input[type="text"]:focus {
+    border-color: #3b82f6;
+    outline: none;
+  }
+
+  button {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: white;
+    transition: background-color 0.25s ease, transform 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  button[type="submit"] {
+    background-color: #2563eb;
+  }
+
+  button[type="submit"]:hover,
+  button[type="submit"]:focus {
+    background-color: #1e40af;
+    transform: translateY(-2px);
+    outline: none;
+  }
+
+  button.cancel {
+    background-color: #ef4444;
+  }
+
+  button.cancel:hover,
+  button.cancel:focus {
+    background-color: #b91c1c;
+    transform: translateY(-2px);
+    outline: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    body {
+      padding: 15px 10px;
+    }
+
+    .dashboard {
+      max-width: 100%;
+    }
+
+    .order {
+      padding: 18px 20px;
+    }
+
+    form {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    input[type="text"] {
+      width: 100%;
+    }
+
+    button {
+      width: 100%;
+      flex-shrink: 0;
+    }
+  }
+</style>
+</head>
+<body>
+  <main class="dashboard">
+    <h1>Welcome, {{ request.user.username }}</h1>
+
+    <section class="section new-orders">
+      <h2>New Orders</h2>
+      {% for order in new_orders %}
+      <article class="order" aria-label="New order {{ order.id }}">
+        <h3>Order #{{ order.id }}</h3>
+        <p><strong>Service:</strong> {{ order.service_name }}</p>
+        <p><strong>Address:</strong> {{ order.address }}</p>
+        <p><strong>Message:</strong> {{ order.message }}</p>
+        <p><strong>Amount:</strong> ₹{{ order.amount }}</p>
+        <p><strong>Mobile:</strong> {{ order.user.last_name }}</p>
+        <p><strong>Location:</strong> <a href="https://www.google.com/maps?q={{order.latitude}},{{order.longitude}}"target="_blank">Click me</a></p>
+
+        <form method="post" action="{% url 'accept_order' order.id %}">
+          {% csrf_token %}
+          <button type="submit">Accept</button>
+        </form>
+
+        <form method="post" action="{% url 'reject_order' order.id %}">
+          {% csrf_token %}
+          <button type="submit" class="cancel">Cancel</button>
+        </form>
+      </article>
+      {% empty %}
+      <p>No new orders assigned.</p>
+      {% endfor %}
+    </section>
+
+    <section class="section pending-orders">
+      <h2>Pending Orders (Accepted)</h2>
+      {% for order in pending_orders %}
+      <article class="order" aria-label="Pending order {{ order.id }}">
+        <h3>Order #{{ order.id }}</h3>
+        <p><strong>Service:</strong> {{ order.service_name }}</p>
+        <p><strong>Address:</strong> {{ order.address }}</p>
+        <p><strong>Message:</strong> {{ order.message }}</p>
+        <p><strong>Amount:</strong> ₹{{ order.amount }}</p>
+        <p><strong>Mobile:</strong> {{ order.user.last_name }}</p>
+        <p><strong>Location:</strong> <a href="https://www.google.com/maps?q={{order.latitude}},{{order.longitude}}"target="_blank">Click me</a></p>
+
+
+        {% if order.status == 'Accepted' %}
+        <form method="post" action="{% url 'verify_completion_pin' order.id %}">
+          {% csrf_token %}
+          <label for="pin_{{ order.id }}">Enter Completion PIN:</label>
+          <input
+            type="text"
+            name="pin"
+            id="pin_{{ order.id }}"
+            pattern="\d{4}"
+            maxlength="4"
+            required
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            aria-describedby="pinHelp_{{ order.id }}"
+          />
+          <button type="submit">Mark Completed</button>
+        </form>
+        {% else %}
+        <p><strong>Status:</strong> {{ order.status }}</p>
+        {% endif %}
+      </article>
+      {% empty %}
+      <p>No accepted orders.</p>
+      {% endfor %}
+    </section>
+  </main>
+</body>
+</html>

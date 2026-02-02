@@ -1,0 +1,168 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Order Details - Order #{{ order.id }}</title>
+    <style>
+        /* Reset and base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f7f9fc;
+            color: #333;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: #fff;
+            max-width: 700px;
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px 40px;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #004aad;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .section-title {
+            font-weight: 700;
+            font-size: 18px;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            color: #222;
+            border-bottom: 2px solid #004aad;
+            padding-bottom: 6px;
+        }
+
+        .details-list {
+            list-style: none;
+            margin-top: 10px;
+        }
+
+        .details-list li {
+            background-color: #f4f7fb;
+            margin-bottom: 10px;
+            padding: 14px 20px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 16px;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .details-list li span.label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .details-list li span.value {
+            color: #004aad;
+            font-weight: 600;
+            max-width: 60%;
+            text-align: right;
+            word-break: break-word;
+        }
+
+        .back-btn {
+            margin-top: 30px;
+            display: block;
+            width: 150px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 12px 0;
+            background-color: #004aad;
+            color: white;
+            text-align: center;
+            font-weight: 700;
+            font-size: 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(0, 74, 173, 0.3);
+            transition: background-color 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background-color: #003380;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+
+            .details-list li {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .details-list li span.value {
+                text-align: left;
+                margin-top: 6px;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Order Details</h1>
+
+        <ul class="details-list">
+            <li><span class="label">Order ID:</span> <span class="value">{{ order.id }}</span></li>
+            <li><span class="label">Customer:</span> <span class="value">{{ order.user.username }}</span></li>
+            <li><span class="label">Service Name:</span> <span class="value">{{ order.service_name }}</span></li>
+            <li><span class="label">Address:</span> <span class="value">{{ order.address }}</span></li>
+            <li><span class="label">Message:</span> <span class="value">{{ order.message|default:"No message provided" }}</span></li>
+            <li><span class="label">Amount:</span> <span class="value">₹{{ order.amount }}</span></li>
+            <li><span class="label">Status:</span> <span class="value">{{ order.status }}</span></li>
+            <li>
+            <span class="label">Service Provider:</span>
+            <span class="value">
+                {% if order.status == 'Accepted' %}
+                    {{ order.service_provider.servicer_name }}<br>
+                    📞 {{ order.service_provider.mobile_number }}
+                {% else %}
+                    Not assigned yet
+                {% endif %}
+            </span>
+        </li>
+            <li><span class="label">Created At:</span> <span class="value">{{ order.created_at|date:"M d, Y - h:i A" }}</span></li>
+            <li><span class="label">Payment ID:</span> <span class="value">
+                {% if order.payment_id %}
+                    {{ order.payment_id }}
+                {% else %}
+                    Not paid yet
+                {% endif %}
+            </span></li>
+            <li>
+            <span class="label">PIN:</span> 
+            <span class="value" style="color: #c0392b; font-weight: 700;">
+                {{ order.pin }} — <em>Don't share with service provider until service is completed</em>
+            </span>
+            </li>
+        </ul>
+
+        <a href="{% url 'my_orders' %}" class="back-btn">Back to My Orders</a>
+    </div>
+
+</body>
+
+</html>
