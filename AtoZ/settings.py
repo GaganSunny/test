@@ -24,6 +24,8 @@ ALLOWED_HOSTS = [
     ".vercel.app",
     "localhost",
     "127.0.0.1",
+    "knlatozservices.com",
+    "www.knlatozservices.com"
 ]
 
 
@@ -153,3 +155,4 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # --------------------------------------------------
 RAZORPAY_KEY_ID = "rzp_test_qHWUbkIiLDISfr"
 RAZORPAY_KEY_SECRET = "sm3pCJNKdzAijTfJt2RQdtwF"
+
